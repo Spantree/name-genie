@@ -65,7 +65,7 @@ Marielle Fastfeat (Female)
 
 First and last name lists provided by [Scrapmaker](http://scrapmaker.com/dir/names).
 
-Library Copyright 2013, Spantree Technology Group, LLC.
+Copyright 2013, Cedric Hurst and Spantree Technology Group, LLC.
 
 ## License
 
