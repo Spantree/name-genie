@@ -1,7 +1,6 @@
 package net.spantree.namegenie
 
 import groovy.transform.CompileStatic
-import org.apache.commons.lang.WordUtils
 
 @CompileStatic
 class NameList {
