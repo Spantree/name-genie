@@ -1,0 +1,20 @@
+apply plugin: 'java'
+apply plugin: 'groovy'
+
+group = 'net.spantree'
+version = '1.0.0-SNAPSHOT'
+
+configurations.all {
+    resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
+
+    testCompile 'ch.qos.logback:logback-classic:1.0.13'
+    testCompile 'org.spockframework:spock-core:0.7-groovy-2.0'
+}
