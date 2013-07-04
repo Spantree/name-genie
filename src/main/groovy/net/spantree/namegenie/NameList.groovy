@@ -17,7 +17,8 @@ class NameList {
 
     private void addStream(InputStream file) {
         file.eachLine { String line ->
-            names << line.trim()
+            line = line.trim()
+            if(line) names << line
         }
     }
 
