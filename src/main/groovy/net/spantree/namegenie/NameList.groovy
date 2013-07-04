@@ -7,19 +7,15 @@ class NameList {
     List<String> names = []
 
     NameList(String fileName) {
-        URL url = getClass().getResource(fileName)
-        if(!url) {
-            throw new IllegalStateException("Could not find file ${fileName} in classpath")
-        }
-        File file = new File(url.path)
-        addFile(file)
+        def stream = getClass().getResourceAsStream(fileName)
+        addStream(stream)
     }
 
     NameList(File file) {
-        addFile(file)
+        addStream(file.newInputStream())
     }
 
-    private void addFile(File file) {
+    private void addStream(InputStream file) {
         file.eachLine { String line ->
             names << line.trim()
         }
