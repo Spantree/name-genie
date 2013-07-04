@@ -72,7 +72,7 @@ Copyright 2013, Cedric Hurst and Spantree Technology Group, LLC.
 ```
 This software is licensed under the Apache 2 license, quoted below.
 
-Copyright 2009-2013 Shay Banon and ElasticSearch <http://www.elasticsearch.org>
+Copyright 2013 Cedric Hurst and Spantree Technology Group <http://www.spantree.net>
 
 Licensed under the Apache License, Version 2.0 (the "License"); you may not
 use this file except in compliance with the License. You may obtain a copy of
