@@ -54,7 +54,7 @@ class NameGenie {
         def jobName = jobNames.pickRandom()
         def companyName = companyNames.pickRandom()
 
-        new Employee(firstName: person.firstName, lastName: person.lastName, gender: person.gender, jobName: jobName, companyName: companyName)
+        new Employee(firstName: person.firstName, lastName: person.lastName, gender: person.gender, avatarUrl: person.avatarUrl, jobName: jobName, companyName: companyName)
     }
 
     boolean nameAlreadyExists(Person person) {

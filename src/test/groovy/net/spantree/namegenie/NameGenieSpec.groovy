@@ -67,8 +67,14 @@ class NameGenieSpec extends Specification {
     }
 
     def "should generate an avatar"() {
-        expect: "there will be no name or hash collisions for genetrated names"
+        expect: "a non-null avatar URL"
         Person p = genie.generate(true)
         assert p.avatarUrl
+    }
+
+    def "should generate an avatar for an employee"() {
+        expect: "a non-null avatar URL"
+        Employee e = genie.generateEmployee(true)
+        assert e.avatarUrl
     }
 }
