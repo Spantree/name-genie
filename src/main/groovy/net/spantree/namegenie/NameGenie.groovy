@@ -17,13 +17,13 @@ class NameGenie {
     Double femaleToMaleRatio
     Set<ByteBuffer> previousNameHashes = []
 
-    NameGenie(double maleToFemaleRatio = 0.5, nameToAvatarMap = "avatarMappings.txt") {
+    NameGenie(double maleToFemaleRatio = 0.5, String nameToAvatarMap = "avatarMappings.txt") {
         this.femaleFirstNames = new NameList('firstNames_female.txt')
         this.maleFirstNames = new NameList('firstNames_male.txt')
         this.lastNames = new NameList('lastNames.txt')
         this.jobNames = new NameList('jobNames.txt')
         this.companyNames = new NameList('companyNames.txt')
-        this.nameToAvatarMap = generateNameToAvatarMap('avatarMappings.txt')
+        this.nameToAvatarMap = generateNameToAvatarMap(nameToAvatarMap)
         this.femaleToMaleRatio = maleToFemaleRatio
     }
 
