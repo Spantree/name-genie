@@ -65,6 +65,12 @@ Marielle Fastfeat (Female)
 
 First and last name lists provided by [Scrapmaker](http://scrapmaker.com/dir/names).
 
+Job name list provided by [U.S. Bureau of Labor Statistics](http://www.bls.gov/ooh/print/a-z-index.htm)
+
+Company name list provided by [Freebase](http://www.freebase.com/fictional_universe/fictional_employer?instances=)
+
+Default avatars provided by [Github's Octodex](http://octodex.github.com/), with randomization provided by [Random-Octocat](https://github.com/elcuervo/random-octocat)
+
 Copyright 2013, Cedric Hurst and Spantree Technology Group, LLC.
 
 ## License
