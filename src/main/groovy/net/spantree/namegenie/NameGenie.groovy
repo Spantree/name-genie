@@ -102,4 +102,32 @@ class NameGenie {
         }
         map
     }
+
+    void setNameToAvatarMap(String fileName) {
+        this.nameToAvatarMap = generateNameToAvatarMap(fileName)
+    }
+
+    void setFemaleFirstNames(String fileName) {
+        this.femaleFirstNames = new NameList(fileName)
+    }
+
+    void setMaleFirstNames(String fileName) {
+        this.maleFirstNames = new NameList(fileName)
+    }
+
+    void setLastNames(String fileName) {
+        this.lastNames = new NameList(fileName)
+    }
+
+    void setJobNames(String fileName) {
+        this.jobNames = new NameList(fileName)
+    }
+
+    void setCompanyNames(String fileName) {
+        this.companyNames = new NameList(fileName)
+    }
+
+    void setFemaleToMaleRatio(Double femaleToMaleRatio) {
+        this.femaleToMaleRatio = femaleToMaleRatio
+    }
 }
