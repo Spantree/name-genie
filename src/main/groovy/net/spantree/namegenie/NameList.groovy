@@ -6,6 +6,8 @@ import groovy.transform.CompileStatic
 class NameList {
     List<String> names = []
 
+    NameList() {}
+
     NameList(String fileName) {
         def stream = getClass().getResourceAsStream(fileName)
         addStream(stream)
@@ -18,8 +20,12 @@ class NameList {
     private void addStream(InputStream file) {
         file.eachLine { String line ->
             line = line.trim()
-            if(line) names << line
+            if (line) names << line
         }
+    }
+
+    void add(String name) {
+        names.add(name)
     }
 
     String pickRandom() {
