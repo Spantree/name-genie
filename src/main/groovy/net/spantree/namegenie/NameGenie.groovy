@@ -11,13 +11,19 @@ class NameGenie {
     NameList femaleFirstNames
     NameList maleFirstNames
     NameList lastNames
+    NameList jobNames
+    NameList companyNames
+    Map<String, NameList> nameToAvatarMap
     Double femaleToMaleRatio
     Set<ByteBuffer> previousNameHashes = []
 
-    NameGenie(double maleToFemaleRatio = 0.5) {
+    NameGenie(double maleToFemaleRatio = 0.5, nameToAvatarMap = "avatarMappings.txt") {
         this.femaleFirstNames = new NameList('firstNames_female.txt')
         this.maleFirstNames = new NameList('firstNames_male.txt')
         this.lastNames = new NameList('lastNames.txt')
+        this.jobNames = new NameList('jobNames.txt')
+        this.companyNames = new NameList('companyNames.txt')
+        this.nameToAvatarMap = generateNameToAvatarMap('avatarMappings.txt')
         this.femaleToMaleRatio = maleToFemaleRatio
     }
 
@@ -26,38 +32,74 @@ class NameGenie {
      *
      * @return A person with a random combination of gender, first name and last name
      */
-    Person generate() {
+    Person generate(avatar = false) {
         Gender gender = (RandomSingleton.instance.nextDouble() < femaleToMaleRatio) ? Gender.Female : Gender.Male
-        (gender == Gender.Female ? generateFemale() : generateMale())
+        (gender == Gender.Female ? generateFemale(avatar) : generateMale(avatar))
     }
 
-    Person generateFemale() {
-        generateForGender(Gender.Female)
+    Person generateFemale(avatar = false) {
+        generateForGender(Gender.Female, avatar)
     }
 
-    Person generateMale() {
-        generateForGender(Gender.Male)
+    Person generateMale(avatar = false) {
+        generateForGender(Gender.Male, avatar)
+    }
+
+    Employee generateEmployee(avatar = false) {
+        def person = generate(avatar)
+        generateEmployeeForPerson(person)
+    }
+
+    Employee generateEmployeeForPerson(Person person) {
+        def jobName = jobNames.pickRandom()
+        def companyName = companyNames.pickRandom()
+
+        new Employee(firstName: person.firstName, lastName: person.lastName, gender: person.gender, jobName: jobName, companyName: companyName)
     }
 
     boolean nameAlreadyExists(Person person) {
         !previousNameHashes.add(person.sha1NameHash)
     }
 
-    private Person generateForGender(Gender gender) {
+    private Person generateForGender(Gender gender, avatar = false) {
         Person person = null
         NameList firstNameList = (gender == Gender.Female ? femaleFirstNames : maleFirstNames)
         int retries = 0
-        while(retries++ < RETRY_CAP) {
+        while (retries++ < RETRY_CAP) {
             String firstName = firstNameList.pickRandom()
             String lastName = lastNames.pickRandom()
             person = new Person(firstName: firstName, lastName: lastName, gender: gender)
-            if(!nameAlreadyExists(person)) {
-                break
+            if (!nameAlreadyExists(person)) {
+                if (avatar) {
+                    if (nameToAvatarMap.containsKey(firstName)) {
+                        person.avatarUrl = nameToAvatarMap.get(firstName).pickRandom()
+                        break
+                    }
+                } else {
+                    break
+                }
             }
+
         }
-        if(retries >= RETRY_CAP) {
+        if (retries >= RETRY_CAP) {
             throw new IllegalStateException("Tried to generate unique name ${retries} times, retry cap of ${RETRY_CAP} exceeded")
         }
         person
+    }
+
+    private Map<String, NameList> generateNameToAvatarMap(String file) {
+
+        def stream = getClass().getResourceAsStream(file)
+        def map = new HashMap<String, NameList>()
+        stream.eachLine {
+            String line ->
+                def firstName = line.split()[0]
+                def avatarUrl = line.split()[1]
+                if (!map.containsKey(firstName)) {
+                    map.put(firstName, new NameList())
+                }
+                map.get(firstName).add(avatarUrl)
+        }
+        map
     }
 }

@@ -12,6 +12,7 @@ class Person {
     String firstName
     String lastName
     Gender gender
+    String avatarUrl
 
     ByteBuffer sha1NameHash
 
