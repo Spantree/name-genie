@@ -17,6 +17,10 @@ class NameList {
         addStream(file.newInputStream())
     }
 
+    NameList(InputStream stream){
+        addStream(stream)
+    }
+
     private void addStream(InputStream file) {
         file.eachLine { String line ->
             line = line.trim()

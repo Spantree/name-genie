@@ -23,7 +23,7 @@ class NameGenie {
         this.lastNames = new NameList('lastNames.txt')
         this.jobNames = new NameList('jobNames.txt')
         this.companyNames = new NameList('companyNames.txt')
-        this.nameToAvatarMap = generateNameToAvatarMap(nameToAvatarMap)
+        this.nameToAvatarMap = generateNameToAvatarMap(getClass().getResourceAsStream(nameToAvatarMap))
         this.femaleToMaleRatio = maleToFemaleRatio
     }
 
@@ -87,9 +87,7 @@ class NameGenie {
         person
     }
 
-    private Map<String, NameList> generateNameToAvatarMap(String file) {
-
-        def stream = getClass().getResourceAsStream(file)
+    private Map<String, NameList> generateNameToAvatarMap(InputStream stream) {
         def map = new HashMap<String, NameList>()
         stream.eachLine {
             String line ->
@@ -103,28 +101,28 @@ class NameGenie {
         map
     }
 
-    void setNameToAvatarMap(String fileName) {
-        this.nameToAvatarMap = generateNameToAvatarMap(fileName)
+    void setNameToAvatarMap(InputStream stream) {
+        this.nameToAvatarMap = generateNameToAvatarMap(stream)
     }
 
-    void setFemaleFirstNames(String fileName) {
-        this.femaleFirstNames = new NameList(fileName)
+    void setFemaleFirstNames(InputStream stream) {
+        this.femaleFirstNames = new NameList(stream)
     }
 
-    void setMaleFirstNames(String fileName) {
-        this.maleFirstNames = new NameList(fileName)
+    void setMaleFirstNames(InputStream stream) {
+        this.maleFirstNames = new NameList(stream)
     }
 
-    void setLastNames(String fileName) {
-        this.lastNames = new NameList(fileName)
+    void setLastNames(InputStream stream) {
+        this.lastNames = new NameList(stream)
     }
 
-    void setJobNames(String fileName) {
-        this.jobNames = new NameList(fileName)
+    void setJobNames(InputStream stream) {
+        this.jobNames = new NameList(stream)
     }
 
-    void setCompanyNames(String fileName) {
-        this.companyNames = new NameList(fileName)
+    void setCompanyNames(InputStream stream) {
+        this.companyNames = new NameList(stream)
     }
 
     void setFemaleToMaleRatio(Double femaleToMaleRatio) {
