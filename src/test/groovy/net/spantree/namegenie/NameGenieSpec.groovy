@@ -77,4 +77,14 @@ class NameGenieSpec extends Specification {
         Employee e = genie.generateEmployee(true)
         assert e.avatarUrl
     }
+
+    def "should generate an employee given a first / last name"(){
+        expect: "An avatar URL, company name, and job name"
+        Employee e = genie.generateEmployeeByName("First", "Last")
+        assert e.firstName == "First"
+        assert e.lastName == "Last"
+        assert e.avatarUrl
+        assert e.companyName
+        assert e.jobName
+    }
 }

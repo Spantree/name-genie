@@ -3,6 +3,7 @@ package net.spantree.namegenie
 import groovy.transform.CompileStatic
 
 import java.nio.ByteBuffer
+import java.security.MessageDigest
 
 @CompileStatic
 class NameGenie {
@@ -59,6 +60,27 @@ class NameGenie {
 
     boolean nameAlreadyExists(Person person) {
         !previousNameHashes.add(person.sha1NameHash)
+    }
+
+    Employee generateEmployeeByName(String firstName, String lastName = "Last") {
+        def jobName = jobNames.pickRandom()
+        def companyName = companyNames.pickRandom()
+
+        def avatarUrl
+        if (nameToAvatarMap.containsKey(firstName)) {
+            avatarUrl = nameToAvatarMap.get(firstName).pickRandom()
+        } else {
+            MessageDigest digest = MessageDigest.getInstance("MD5")
+            def sampleEmail = firstName.toLowerCase().trim() + "@gravatar.com"
+            digest.update(sampleEmail.bytes)
+
+            BigInteger big = new BigInteger(1, digest.digest())
+            String md5 = big.toString(16).padLeft(32, "0")
+
+            avatarUrl = "http://gravatar.com/avatar/" + sampleEmail + "?d=identicon"
+        }
+        new Employee(firstName: firstName, lastName: lastName, avatarUrl: avatarUrl, jobName: jobName, companyName: companyName)
+
     }
 
     private Person generateForGender(Gender gender, avatar = false) {
