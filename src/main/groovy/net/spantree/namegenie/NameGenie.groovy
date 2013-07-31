@@ -77,7 +77,7 @@ class NameGenie {
             BigInteger big = new BigInteger(1, digest.digest())
             String md5 = big.toString(16).padLeft(32, "0")
 
-            avatarUrl = "http://gravatar.com/avatar/" + md5 + "?d=identicon"
+            avatarUrl = "http://gravatar.com/avatar/" + md5
         }
         new Employee(firstName: firstName, lastName: lastName, avatarUrl: avatarUrl, jobName: jobName, companyName: companyName)
 
