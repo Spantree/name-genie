@@ -1,4 +1,4 @@
-package net.spantree.namegenie
+package net.spantree.namegenius
 
 import spock.lang.Specification
 

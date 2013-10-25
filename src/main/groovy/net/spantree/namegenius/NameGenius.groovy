@@ -1,4 +1,4 @@
-package net.spantree.namegenie
+package net.spantree.namegenius
 
 import groovy.transform.CompileStatic
 
@@ -6,7 +6,7 @@ import java.nio.ByteBuffer
 import java.security.MessageDigest
 
 @CompileStatic
-class NameGenie {
+class NameGenius {
     static final int RETRY_CAP = 1000
 
     NameList femaleFirstNames
@@ -15,17 +15,26 @@ class NameGenie {
     NameList jobNames
     NameList companyNames
     Map<String, NameList> nameToAvatarMap
-    Double femaleToMaleRatio
+    Double percentageFemale
     Set<ByteBuffer> previousNameHashes = []
 
-    NameGenie(double maleToFemaleRatio = 0.5, String nameToAvatarMap = "avatarMappings.txt") {
+    /**
+    * Creates a new NameGenius object with the given percentageFemale, and a map of first name -> picture
+     *
+     * @param percentageFemale This sets the percentage of females vs males generated on average
+     * @param nameToAvatarMap This points to a particular file which contains a list in the form
+     * name avatarLocation
+     *
+     * @return A NameGenius object
+    */
+    NameGenius(double percentageFemale = 0.5, String nameToAvatarMap = "avatarMappings.txt") {
         this.femaleFirstNames = new NameList('firstNames_female.txt')
         this.maleFirstNames = new NameList('firstNames_male.txt')
         this.lastNames = new NameList('lastNames.txt')
         this.jobNames = new NameList('jobNames.txt')
         this.companyNames = new NameList('companyNames.txt')
         this.nameToAvatarMap = generateNameToAvatarMap(nameToAvatarMap)
-        this.femaleToMaleRatio = maleToFemaleRatio
+        this.percentageFemale = percentageFemale
     }
 
     /**
@@ -34,7 +43,7 @@ class NameGenie {
      * @return A person with a random combination of gender, first name and last name
      */
     Person generate(avatar = false) {
-        Gender gender = (RandomSingleton.instance.nextDouble() < femaleToMaleRatio) ? Gender.Female : Gender.Male
+        Gender gender = (RandomSingleton.instance.nextDouble() < percentageFemale) ? Gender.Female : Gender.Male
         (gender == Gender.Female ? generateFemale(avatar) : generateMale(avatar))
     }
 
@@ -149,7 +158,7 @@ class NameGenie {
         this.companyNames = new NameList(fileName)
     }
 
-    void setFemaleToMaleRatio(Double femaleToMaleRatio) {
-        this.femaleToMaleRatio = femaleToMaleRatio
+    void setPercentageFemale(Double femaleToMaleRatio) {
+        this.percentageFemale = femaleToMaleRatio
     }
 }

@@ -1,6 +1,7 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'maven-publish'
+apply plugin: 'signing'
 
 
 group = 'net.spantree.namegenius'
@@ -25,32 +26,108 @@ dependencies {
 }
 
 jar {
-    baseName 'name-genie'
+    baseName 'name-genius'
 }
 
-task sourceJar (type : Jar) {
+task sourceJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
 }
 
-task javadocJar (type: Jar, dependsOn: javadoc) { // (1)
+task javadocJar(type: Jar, dependsOn: javadoc) { // (1)
     classifier = 'javadoc'
     from javadoc.destinationDir
 }
 
+ext {
+    pomFilePath = "build/tmp/pom.xml"
+    pomFile = file(pomFilePath)
+}
+
+
+configurations {
+    pom
+}
+artifacts {
+    archives jar
+    archives sourceJar
+    archives javadocJar
+    if (pomFile.exists()) {
+        pom pomFile
+    }
+}
+
+task signPom(type: Sign) {
+    sign configurations.pom
+}
+
+task signJars(type: Sign, dependsOn: [jar, javadocJar, sourceJar]) {
+    sign configurations.archives
+}
+
+if (project.ext.pomFile.exists()) {
+    task preparePublication(dependsOn: [signJars, signPom])
+} else {
+    task preparePublication(dependsOn: signJars)
+}
+
+def getSignatureFiles = {
+    def allFiles = project.tasks.signJars.signatureFiles.collect { it }
+    def signedSources = allFiles.find { it.name.contains('-sources') }
+    def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
+    def signedJar = (allFiles - [signedSources, signedJavadoc])[0]
+    return [
+            [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
+            [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
+            [archive: signedJar, classifier: null, extension: 'jar.asc']
+    ]
+}
+
+def getPomSignature = {
+    return project.tasks.signPom.signatureFiles.collect { it }[0]
+}
+
 publishing {
-        publications {
-            maven(MavenPublication) {
-		pom.withXml {
+    publications {
+        gpgJars(MavenPublication) {
+            getSignatureFiles().each { signature ->
+                artifact(signature.archive) {
+                    classifier = signature.classifier
+                    extension = signature.extension
+                }
+            }
+        }
+        if (project.ext.pomFile.exists()) {
+            gpgPom(MavenPublication) {
+                artifact(getPomSignature()) {
+                    classifier = null
+                    extension = 'pom.asc'
+                }
+            }
+        }
+
+
+        signatures(MavenPublication) {
+            // give signature files to rtifact method
+            getSignatureFiles().each { signature ->
+                artifact(signature.archive) {
+                    classifier = signature.classifier
+                    extension = signature.extension
+                }
+            }
+        }
+
+        jar(MavenPublication) {
+            pom.withXml {
                 asNode().children().last() + {
                     resolveStrategy = Closure.DELEGATE_FIRST
-                    name 'Name Genie'
+                    name 'Name Genius'
                     description 'Randomly generated users'
-                    url 'https://github.com/Spantree/name-genie'
+                    url 'https://github.com/Spantree/name-genius'
                     scm {
                         url 'https://github.com/Spantree/name-genius'
-                        connection 'https://github.com/Spantree/name-genius'
-                        developerConnection 'https://github.com/Spantree/name-genius'
+                        connection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
+                        developerConnection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
                     }
                     licenses {
                         license {
@@ -76,14 +153,21 @@ publishing {
             }
         }
     }
-	repositories {
-	    maven {
-	    	url "https://oss.sonatype.org/content/repositories/snapshots/"
-		credentials {
-		    username = sonatypeUsername
-		    password = sonatypePassword
-		}
-	    }
-	}
+    repositories {
+        maven {
+            if (project.ext.pomFile.exists()) {
+
+
+                url "https://oss.sonatype.org/content/repositories/snapshots/"
+                credentials {
+                    username = sonatypeUsername
+                    password = sonatypePassword
+                }
+
+            } else {
+                url "build/libs"
+            }
+        }
     }
+}
 

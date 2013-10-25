@@ -1,7 +1,7 @@
-# Name Genie
+# Name Genius
 
 A Java/Groovy library that generates randomized, unique first and last names with gender.  Each generated name is
-guaranteed unique for the lifecycle of a given NameGenie object.  It will regenerate if it detects a collision. If
+guaranteed unique for the lifecycle of a given NameGenius object.  It will regenerate if it detects a collision. If
 generating for both genders, there should be over 16 million unique names possible.
 
 ## Basic
@@ -9,13 +9,13 @@ generating for both genders, there should be over 16 million unique names possib
 ### Usage
 
 ```groovy
-import net.spantree.NameGenie
+import net.spantree.NameGenius
 import net.spantree.Person
 
-NameGenie genie = new NameGenie()
+NameGenius genius = new NameGenius()
 def people = []
 10.times {
-    people << genie.generate()
+    people << genius.generate()
 }
 people.each { Person person ->
     println "${person.firstName} ${person.lastName} (${person.gender})"
@@ -42,15 +42,15 @@ Lise Tresrch (Female)
 ### Usage
 
 ```groovy
-import net.spantree.NameGenie
+import net.spantree.NameGenius
 import net.spantree.Person
 
-NameGenie genie = new NameGenie()
+NameGenius genius = new NameGenius()
 
-Person male = genie.generateMale()
+Person male = genius.generateMale()
 println "${male.firstName} ${male.lastName} (${male.gender})"
 
-Person female = genie.generateFemale()
+Person female = genius.generateFemale()
 println "${female.firstName} ${female.lastName} (${female.gender})"
 ```
 
