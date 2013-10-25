@@ -1,8 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
+apply plugin: 'maven-publish'
 
-group = 'net.spantree'
-version = '1.0.11'
+
+group = 'net.spantree.namegenius'
+version = '1.0.11-SNAPSHOT'
+artifact = 'name-genius'
 
 configurations.all {
     resolutionStrategy.cacheChangingModulesFor 0, 'seconds'
@@ -14,7 +17,7 @@ repositories {
 
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    compile: 'org.codehaus.groovy.modules.http-builder:0.5.2'
+    compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2'
 
 
     testCompile 'ch.qos.logback:logback-classic:1.0.13'
@@ -24,3 +27,63 @@ dependencies {
 jar {
     baseName 'name-genie'
 }
+
+task sourceJar (type : Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+task javadocJar (type: Jar, dependsOn: javadoc) { // (1)
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+publishing {
+        publications {
+            maven(MavenPublication) {
+		pom.withXml {
+                asNode().children().last() + {
+                    resolveStrategy = Closure.DELEGATE_FIRST
+                    name 'Name Genie'
+                    description 'Randomly generated users'
+                    url 'https://github.com/Spantree/name-genie'
+                    scm {
+                        url 'https://github.com/Spantree/name-genius'
+                        connection 'https://github.com/Spantree/name-genius'
+                        developerConnection 'https://github.com/Spantree/name-genius'
+                    }
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'surrealanalysis'
+                            name 'Kevin Greene'
+                            email 'kevin@spantree.net'
+                        }
+                        developer {
+                            id 'divideby0'
+                            name 'Cedric Hurst'
+                            email 'cedric@spantree.net'
+                        }
+
+                    }
+                }
+            }
+        }
+    }
+	repositories {
+	    maven {
+	    	url "https://oss.sonatype.org/content/repositories/snapshots/"
+		credentials {
+		    username = sonatypeUsername
+		    password = sonatypePassword
+		}
+	    }
+	}
+    }
+
