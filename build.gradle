@@ -1,6 +1,6 @@
 apply plugin: 'java'
 apply plugin: 'groovy'
-apply plugin: 'maven-publish'
+apply plugin: 'maven'
 apply plugin: 'signing'
 
 
@@ -16,6 +16,10 @@ repositories {
     mavenCentral()
 }
 
+signing {
+    sign configurations.archives
+}
+
 dependencies {
     compile "org.codehaus.groovy:groovy-all:${groovyVersion}"
     compile 'org.codehaus.groovy.modules.http-builder:http-builder:0.5.2'
@@ -29,163 +33,56 @@ task sourceJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
-task javadocJar(type: Jar, dependsOn: javadoc) { // (1)
+task javadocJar(type: Jar, dependsOn: javadoc) { 
     classifier = 'javadoc'
-    from javadoc.destinationDir
+    from 'build/docs/javadoc'
 }
 
-ext {
-    pomFilePath = "${project.projectDir}/tmp/pom.xml"
-    pomFile = file(pomFilePath)
-}
-
-
-configurations {
-    pom
-}
 artifacts {
     archives jar
     archives sourceJar
     archives javadocJar
-    if (pomFile.exists()) {
-        pom pomFile
-    }
 }
 
-task signPom(type: Sign) {
-    sign configurations.pom
-}
-
-task signJars(type: Sign, dependsOn: [jar, javadocJar, sourceJar]) {
-    sign configurations.archives
-}
-
-if (project.ext.pomFile.exists()) {
-    task preparePublication(dependsOn: [signJars, signPom])
-} else {
-    task preparePublication(dependsOn: signJars)
-}
-
-def getSignatureFiles = {
-    def allFiles = project.tasks.signJars.signatureFiles.collect { it }
-    def signedSources = allFiles.find { it.name.contains('-sources') }
-    def signedJavadoc = allFiles.find { it.name.contains('-javadoc') }
-    def signedJar = (allFiles - [signedSources, signedJavadoc])[0]
-    return [
-            [archive: signedSources, classifier: 'sources', extension: 'jar.asc'],
-            [archive: signedJavadoc, classifier: 'javadoc', extension: 'jar.asc'],
-            [archive: signedJar, classifier: null, extension: 'jar.asc']
-    ]
-}
-
-def getPomSignature = {
-    return project.tasks.signPom.signatureFiles.collect { it }[0]
-}
-
-publishing {
-    publications {
-        gpgJars(MavenPublication) {
-            pom.withXml {
-                asNode().children().last() + {
-                    resolveStrategy = Closure.DELEGATE_FIRST
-                    name 'Name Genius'
-                    description 'Randomly generated users'
-                    url 'https://github.com/Spantree/name-genius'
-                    scm {
-                        url 'https://github.com/Spantree/name-genius'
-                        connection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
-                        developerConnection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
-                    }
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id 'surrealanalysis'
-                            name 'Kevin Greene'
-                            email 'kevin@spantree.net'
-                        }
-                        developer {
-                            id 'divideby0'
-                            name 'Cedric Hurst'
-                            email 'cedric@spantree.net'
-                        }
-
-                    }
-                }
-            }
-
-            getSignatureFiles().each { signature ->
-                artifact(signature.archive) {
-                    classifier = signature.classifier
-                    extension = signature.extension
-                }
-            }
-        }
-        if (project.ext.pomFile.exists()) {
-            gpgPom(MavenPublication) {
-                artifact(getPomSignature()) {
-                    classifier = null
-                    extension = 'pom.asc'
-                }
-            }
-        }
-        jar(MavenPublication) {
-            from components.java
-            pom.withXml {
-                asNode().children().last() + {
-                    resolveStrategy = Closure.DELEGATE_FIRST
-                    name 'Name Genius'
-                    description 'Randomly generated users'
-                    url 'https://github.com/Spantree/name-genius'
-                    scm {
-                        url 'https://github.com/Spantree/name-genius'
-                        connection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
-                        developerConnection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
-                    }
-                    licenses {
-                        license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
-                            distribution 'repo'
-                        }
-                    }
-                    developers {
-                        developer {
-                            id 'surrealanalysis'
-                            name 'Kevin Greene'
-                            email 'kevin@spantree.net'
-                        }
-                        developer {
-                            id 'divideby0'
-                            name 'Cedric Hurst'
-                            email 'cedric@spantree.net'
-                        }
-
-                    }
-                }
-            }
-        }
-    }
+uploadArchives {
     repositories {
-        maven {
-            if (project.ext.pomFile.exists()) {
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
 
-
-                url "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
-                credentials {
-                    username = sonatypeUsername
-                    password = sonatypePassword
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: sonatypeUsername, password: sonatypePassword)
                 }
 
-            } else {
-                url "build/libs"
-            }
+            pom.project {
+                    name 'Name Genius'
+                    description 'Randomly generated users'
+                    url 'https://github.com/Spantree/name-genius'
+                    scm {
+                        url 'https://github.com/Spantree/name-genius'
+                        connection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
+                        developerConnection 'scm:git:ssh:git@github.com:/Spantree/name-genius'
+                    }
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/license/LICENSE-2.0.txt'
+                            distribution 'repo'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'surrealanalysis'
+                            name 'Kevin Greene'
+                            email 'kevin@spantree.net'
+                        }
+                        developer {
+                            id 'divideby0'
+                            name 'Cedric Hurst'
+                            email 'cedric@spantree.net'
+                        }
+
+                    }
+                }
         }
     }
 }
-
