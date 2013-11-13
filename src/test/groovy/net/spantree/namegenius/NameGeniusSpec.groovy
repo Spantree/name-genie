@@ -1,15 +1,15 @@
-package net.spantree.namegenie
+package net.spantree.namegenius
 
 import org.slf4j.LoggerFactory
 import spock.lang.Specification
 
 import java.nio.ByteBuffer
 
-class NameGenieSpec extends Specification {
+class NameGeniusSpec extends Specification {
     static final int TEST_RUNS = 1000000
 
     def log = LoggerFactory.getLogger(getClass())
-    def genie = new NameGenie()
+    def genius = new NameGenius()
 
     def "should generate lots of names with no collisions"() {
         setup:
@@ -22,11 +22,11 @@ class NameGenieSpec extends Specification {
         for (int i = 0; i < TEST_RUNS; i++) {
             Person p
             if (gender == null) {
-                p = genie.generate()
+                p = genius.generate()
             } else if (gender == Gender.Female) {
-                p = genie.generateFemale()
+                p = genius.generateFemale()
             } else {
-                p = genie.generateMale()
+                p = genius.generateMale()
             }
             log.info "Generated ${p.gender} Name:\t${p.firstName} ${p.lastName}"
             assert names.add("${p.firstName} ${p.lastName}")
@@ -55,7 +55,7 @@ class NameGenieSpec extends Specification {
 
         expect: "there will be no name or hash collisions for genetrated names"
         for (int i = 0; i < TEST_RUNS; i++) {
-            Employee e = genie.generateEmployee()
+            Employee e = genius.generateEmployee()
             log.info "Generated ${e.gender} Name:\t${e.firstName} ${e.lastName}, Company: ${e.companyName}, Job: ${e.jobName}"
             assert names.add("${e.firstName} ${e.lastName}")
             assert hashes.add(e.sha1NameHash)
@@ -68,19 +68,19 @@ class NameGenieSpec extends Specification {
 
     def "should generate an avatar"() {
         expect: "a non-null avatar URL"
-        Person p = genie.generate(true)
+        Person p = genius.generate(true)
         assert p.avatarUrl
     }
 
     def "should generate an avatar for an employee"() {
         expect: "a non-null avatar URL"
-        Employee e = genie.generateEmployee(true)
+        Employee e = genius.generateEmployee(true)
         assert e.avatarUrl
     }
 
     def "should generate an employee given a first / last name"(){
         expect: "An avatar URL, company name, and job name"
-        Employee e = genie.generateEmployeeByName("First", "Last")
+        Employee e = genius.generateEmployeeByName("First", "Last")
         assert e.firstName == "First"
         assert e.lastName == "Last"
         assert e.avatarUrl
